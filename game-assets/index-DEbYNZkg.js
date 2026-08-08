@@ -5,4 +5,4 @@
     <div class="loading-line"><i></i></div>
     <p>街を仕込み中…</p>
   </section>
-`;L(async()=>{const{Game:n}=await import("./Game-BoBLVDiG.js").then(t=>t.gx);return{Game:n}},[],import.meta.url).then(({Game:n})=>{const t=document.querySelector("#game-canvas");if(!t)throw new Error("Game canvas was not found");new n(t,h).start()});export{L as _};
+`;L(async()=>{const{Game:n}=await import("./Game-BoBLVDiG.js").then(t=>t.gx);return{Game:n}},[],import.meta.url).then(({Game:n})=>{const t=document.querySelector("#game-canvas");if(!t)throw new Error("Game canvas was not found");window.__demaeGame=new n(t,h),window.__demaeGame.start()});export{L as _};
