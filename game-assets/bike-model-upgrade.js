@@ -1,95 +1,83 @@
-import { gf as Application, ej as Entity, es as StandardMaterial, l as Color } from './Game-BoBLVDiG.js';
+// Runtime-only bike visual upgrade. Avoids importing private names from the minified PlayCanvas bundle.
+(() => {
+  const hexRgb = (hex) => {
+    const v = hex.replace('#', '');
+    return [parseInt(v.slice(0,2),16)/255, parseInt(v.slice(2,4),16)/255, parseInt(v.slice(4,6),16)/255];
+  };
 
-const materials = new Map();
+  function install(app, bike) {
+    if (bike.__demaeModelUpgraded || !bike.children.length) return false;
 
-function material(hex) {
-  if (materials.has(hex)) return materials.get(hex);
-  const value = hex.replace('#', '');
-  const color = new Color(
-    parseInt(value.slice(0, 2), 16) / 255,
-    parseInt(value.slice(2, 4), 16) / 255,
-    parseInt(value.slice(4, 6), 16) / 255,
-  );
-  const mat = new StandardMaterial();
-  mat.diffuse = color;
-  mat.gloss = 28;
-  mat.metalness = 0.03;
-  mat.update();
-  materials.set(hex, mat);
-  return mat;
-}
+    const EntityClass = bike.children[0].constructor;
+    const sourceMaterial = bike.children.find(c => c.render?.meshInstances?.[0]?.material)?.render?.meshInstances?.[0]?.material;
+    if (!EntityClass || !sourceMaterial) return false;
 
-function part(app, parent, name, type, pos, scale, hex, rot) {
-  const entity = new Entity(name);
-  entity.addComponent('render', { type, material: material(hex) });
-  entity.setLocalPosition(...pos);
-  entity.setLocalScale(...scale);
-  if (rot) entity.setLocalEulerAngles(...rot);
-  parent.addChild(entity);
-  return entity;
-}
+    const mats = new Map();
+    const mat = (hex) => {
+      if (mats.has(hex)) return mats.get(hex);
+      const m = sourceMaterial.clone();
+      const [r,g,b] = hexRgb(hex);
+      m.diffuse.set(r,g,b);
+      m.emissive?.set(0,0,0);
+      m.gloss = 28;
+      m.metalness = 0.03;
+      m.update();
+      mats.set(hex,m);
+      return m;
+    };
 
-function buildBike(app, bike) {
-  if (bike.__demaeModelUpgraded) return;
-  bike.__demaeModelUpgraded = true;
+    const part = (parent,name,type,pos,scale,color,rot) => {
+      const e = new EntityClass(name);
+      e.addComponent('render',{type,material:mat(color)});
+      e.setLocalPosition(...pos);
+      e.setLocalScale(...scale);
+      if(rot) e.setLocalEulerAngles(...rot);
+      parent.addChild(e);
+      return e;
+    };
 
-  for (const child of [...bike.children]) child.destroy();
+    bike.__demaeModelUpgraded = true;
+    for (const child of [...bike.children]) child.destroy();
 
-  // Scooter: silhouette-first, intentionally lightweight for phones.
-  part(app, bike, 'scooter-deck', 'box', [0, 0.62, 0], [0.95, 0.22, 2.15], '#374151');
-  part(app, bike, 'rear-body', 'box', [0, 0.88, 0.72], [1.12, 0.72, 1.2], '#dc2626');
-  part(app, bike, 'front-cowl', 'box', [0, 1.03, -0.95], [1.02, 1.25, 0.52], '#dc2626', [14, 0, 0]);
-  part(app, bike, 'front-fender', 'box', [0, 0.56, -1.25], [0.68, 0.28, 0.72], '#b91c1c');
-  part(app, bike, 'seat', 'box', [0, 1.24, 0.16], [0.92, 0.24, 1.25], '#171717');
+    part(bike,'scooter-deck','box',[0,.62,0],[.95,.22,2.15],'#374151');
+    part(bike,'rear-body','box',[0,.88,.72],[1.12,.72,1.2],'#dc2626');
+    part(bike,'front-cowl','box',[0,1.03,-.95],[1.02,1.25,.52],'#dc2626',[14,0,0]);
+    part(bike,'front-fender','box',[0,.56,-1.25],[.68,.28,.72],'#b91c1c');
+    part(bike,'seat','box',[0,1.24,.16],[.92,.24,1.25],'#171717');
+    part(bike,'rear-wheel','cylinder',[0,.38,1.18],[.56,.24,.56],'#111827',[0,0,90]);
+    part(bike,'front-wheel','cylinder',[0,.38,-1.42],[.56,.24,.56],'#111827',[0,0,90]);
+    part(bike,'rear-rim','cylinder',[0,.38,1.18],[.33,.27,.33],'#cbd5e1',[0,0,90]);
+    part(bike,'front-rim','cylinder',[0,.38,-1.42],[.33,.27,.33],'#cbd5e1',[0,0,90]);
+    part(bike,'handlebar','box',[0,1.7,-1],[1.35,.08,.08],'#cbd5e1');
+    part(bike,'headlight','box',[0,1.36,-1.27],[.46,.34,.18],'#fff0a0');
+    part(bike,'turn-left','box',[-.4,1.17,-1.25],[.16,.1,.1],'#f59e0b');
+    part(bike,'turn-right','box',[.4,1.17,-1.25],[.16,.1,.1],'#f59e0b');
 
-  part(app, bike, 'rear-wheel', 'cylinder', [0, 0.38, 1.18], [0.56, 0.24, 0.56], '#111827', [0, 0, 90]);
-  part(app, bike, 'front-wheel', 'cylinder', [0, 0.38, -1.42], [0.56, 0.24, 0.56], '#111827', [0, 0, 90]);
-  part(app, bike, 'rear-rim', 'cylinder', [0, 0.38, 1.18], [0.33, 0.27, 0.33], '#cbd5e1', [0, 0, 90]);
-  part(app, bike, 'front-rim', 'cylinder', [0, 0.38, -1.42], [0.33, 0.27, 0.33], '#cbd5e1', [0, 0, 90]);
+    // White delivery box, clearly visible from chase camera.
+    part(bike,'delivery-box','box',[0,1.62,.92],[1.42,1.25,1.28],'#f8fafc');
+    part(bike,'delivery-box-band','box',[0,1.68,.25],[1.46,.16,.06],'#dc2626');
 
-  part(app, bike, 'handlebar', 'box', [0, 1.7, -1.0], [1.35, 0.08, 0.08], '#cbd5e1');
-  part(app, bike, 'grip-left', 'cylinder', [-0.62, 1.7, -1.0], [0.09, 0.28, 0.09], '#111827', [0, 0, 90]);
-  part(app, bike, 'grip-right', 'cylinder', [0.62, 1.7, -1.0], [0.09, 0.28, 0.09], '#111827', [0, 0, 90]);
-  part(app, bike, 'headlight', 'box', [0, 1.36, -1.27], [0.46, 0.34, 0.18], '#fff0a0');
-  part(app, bike, 'turn-left', 'box', [-0.4, 1.17, -1.25], [0.16, 0.1, 0.1], '#f59e0b');
-  part(app, bike, 'turn-right', 'box', [0.4, 1.17, -1.25], [0.16, 0.1, 0.1], '#f59e0b');
-
-  // White delivery box: large and readable from the chase camera.
-  part(app, bike, 'delivery-box', 'box', [0, 1.62, 0.92], [1.42, 1.25, 1.28], '#f8fafc');
-  part(app, bike, 'delivery-box-band', 'box', [0, 1.68, 0.25], [1.46, 0.16, 0.06], '#dc2626');
-
-  // Driver: simplified low-poly body, no tiny facial detail.
-  const driver = new Entity('driver');
-  driver.setLocalPosition(0, 0.02, -0.03);
-  bike.addChild(driver);
-
-  part(app, driver, 'driver-torso', 'box', [0, 1.82, 0.08], [0.58, 0.78, 0.4], '#93c5fd', [8, 0, 0]);
-  part(app, driver, 'driver-head', 'box', [0, 2.38, -0.03], [0.43, 0.46, 0.42], '#e2a782');
-  part(app, driver, 'driver-hair', 'box', [0, 2.61, -0.01], [0.46, 0.16, 0.44], '#262626');
-  part(app, driver, 'driver-cap', 'box', [0, 2.68, -0.06], [0.52, 0.12, 0.5], '#dc2626');
-
-  part(app, driver, 'left-upper-arm', 'box', [-0.38, 1.83, -0.08], [0.16, 0.5, 0.16], '#93c5fd', [55, 0, -18]);
-  part(app, driver, 'right-upper-arm', 'box', [0.38, 1.83, -0.08], [0.16, 0.5, 0.16], '#93c5fd', [55, 0, 18]);
-  part(app, driver, 'left-forearm', 'box', [-0.48, 1.59, -0.5], [0.14, 0.46, 0.14], '#e2a782', [72, 0, -8]);
-  part(app, driver, 'right-forearm', 'box', [0.48, 1.59, -0.5], [0.14, 0.46, 0.14], '#e2a782', [72, 0, 8]);
-
-  part(app, driver, 'left-thigh', 'box', [-0.22, 1.24, 0.0], [0.24, 0.55, 0.24], '#374151', [62, 0, 6]);
-  part(app, driver, 'right-thigh', 'box', [0.22, 1.24, 0.0], [0.24, 0.55, 0.24], '#374151', [62, 0, -6]);
-  part(app, driver, 'left-shin', 'box', [-0.28, 0.9, -0.28], [0.2, 0.5, 0.2], '#374151', [18, 0, 0]);
-  part(app, driver, 'right-shin', 'box', [0.28, 0.9, -0.28], [0.2, 0.5, 0.2], '#374151', [18, 0, 0]);
-  part(app, driver, 'left-shoe', 'box', [-0.29, 0.66, -0.47], [0.22, 0.14, 0.38], '#451a03');
-  part(app, driver, 'right-shoe', 'box', [0.29, 0.66, -0.47], [0.22, 0.14, 0.38], '#451a03');
-}
-
-let attempts = 0;
-const timer = setInterval(() => {
-  attempts += 1;
-  const app = Application.getApplication('game-canvas');
-  const bike = app?.root?.findByName?.('delivery-bike');
-  if (app && bike) {
-    clearInterval(timer);
-    buildBike(app, bike);
-  } else if (attempts > 240) {
-    clearInterval(timer);
+    const driver = new EntityClass('driver');
+    bike.addChild(driver);
+    part(driver,'driver-torso','box',[0,1.82,.08],[.58,.78,.4],'#93c5fd',[8,0,0]);
+    part(driver,'driver-head','box',[0,2.38,-.03],[.43,.46,.42],'#e2a782');
+    part(driver,'driver-hair','box',[0,2.61,-.01],[.46,.16,.44],'#262626');
+    part(driver,'driver-cap','box',[0,2.68,-.06],[.52,.12,.5],'#dc2626');
+    part(driver,'left-arm','box',[-.38,1.75,-.28],[.16,.72,.16],'#93c5fd',[58,0,-15]);
+    part(driver,'right-arm','box',[.38,1.75,-.28],[.16,.72,.16],'#93c5fd',[58,0,15]);
+    part(driver,'left-hand','box',[-.49,1.53,-.67],[.16,.18,.16],'#e2a782');
+    part(driver,'right-hand','box',[.49,1.53,-.67],[.16,.18,.16],'#e2a782');
+    part(driver,'left-leg','box',[-.22,1.05,-.12],[.23,.72,.23],'#374151',[35,0,5]);
+    part(driver,'right-leg','box',[.22,1.05,-.12],[.23,.72,.23],'#374151',[35,0,-5]);
+    return true;
   }
-}, 50);
+
+  let attempts = 0;
+  const timer = setInterval(() => {
+    attempts++;
+    const app = window.__demaeGame?.app;
+    const bike = app?.root?.findByName?.('delivery-bike');
+    if (app && bike && install(app,bike)) clearInterval(timer);
+    else if (attempts > 240) clearInterval(timer);
+  },50);
+})();
