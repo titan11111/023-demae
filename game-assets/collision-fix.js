@@ -84,3 +84,6 @@
     if (install() || tries > 120) clearInterval(timer);
   }, 100);
 })();
+
+// Replace the simple six-part bike with a lightweight low-poly scooter + driver.
+import('./bike-model-upgrade.js').catch(error => console.error('Bike model upgrade failed:', error));
