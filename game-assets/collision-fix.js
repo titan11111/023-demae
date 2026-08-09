@@ -185,7 +185,7 @@ import('./bike-model-upgrade.js').catch(error => console.error('Bike model upgra
   style.textContent = `
     @media (hover: none) and (pointer: coarse), (max-width: 950px) and (max-height: 520px) {
       /* Destination indicator sits below the scooter, in the clear center lane. */
-      .hud .objective {
+      #ui-root .hud .objective {
         top: auto !important;
         bottom: max(72px, calc(env(safe-area-inset-bottom) + 64px)) !important;
         left: 50% !important;
@@ -205,7 +205,7 @@ import('./bike-model-upgrade.js').catch(error => console.error('Bike model upgra
       }
 
       /* Replace the equilateral text glyph with a tall isosceles direction pointer. */
-      .hud .objective span {
+      #ui-root .hud .objective span {
         display: block !important;
         width: 16px !important;
         height: 27px !important;
@@ -221,27 +221,27 @@ import('./bike-model-upgrade.js').catch(error => console.error('Bike model upgra
         filter: drop-shadow(0 2px 1px rgba(0,0,0,.75));
       }
 
-      .hud .objective b {
+      #ui-root .hud .objective b {
         padding: 0 !important;
         background: transparent !important;
         font-size: 10px !important;
         line-height: 1 !important;
       }
 
-      .hud .objective em {
+      #ui-root .hud .objective em {
         font-size: 18px !important;
         line-height: 1 !important;
       }
 
       /* Keep map and speed panel above the bottom control buttons. */
-      .hud .minimap-frame {
+      #ui-root .hud .minimap-frame {
         left: max(14px, env(safe-area-inset-left)) !important;
         bottom: max(118px, calc(env(safe-area-inset-bottom) + 104px)) !important;
         transform-origin: bottom left !important;
         z-index: 12 !important;
       }
 
-      .hud .speedometer {
+      #ui-root .hud .speedometer {
         right: max(14px, env(safe-area-inset-right)) !important;
         bottom: max(124px, calc(env(safe-area-inset-bottom) + 110px)) !important;
         transform-origin: bottom right !important;
@@ -250,23 +250,23 @@ import('./bike-model-upgrade.js').catch(error => console.error('Bike model upgra
     }
 
     @media (orientation: landscape) and (max-height: 430px) {
-      .hud .objective {
+      #ui-root .hud .objective {
         bottom: max(62px, calc(env(safe-area-inset-bottom) + 56px)) !important;
         padding: 4px 8px !important;
       }
 
-      .hud .objective span {
+      #ui-root .hud .objective span {
         width: 14px !important;
         height: 23px !important;
         min-width: 14px !important;
         min-height: 23px !important;
       }
 
-      .hud .minimap-frame {
+      #ui-root .hud .minimap-frame {
         bottom: max(106px, calc(env(safe-area-inset-bottom) + 94px)) !important;
       }
 
-      .hud .speedometer {
+      #ui-root .hud .speedometer {
         bottom: max(112px, calc(env(safe-area-inset-bottom) + 100px)) !important;
       }
     }
