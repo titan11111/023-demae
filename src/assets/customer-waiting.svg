@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 360" role="img" aria-labelledby="title desc">
+  <title id="title">料理を外で待つお客さん</title>
+  <desc id="desc">スマートフォンを手に、玄関先で配達を待っている人物</desc>
+  <defs>
+    <filter id="goldGlow" x="-40%" y="-30%" width="180%" height="170%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feFlood flood-color="#ffd33d" flood-opacity=".9"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="jacket" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#39a6dd"/><stop offset="1" stop-color="#165884"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="334" rx="62" ry="13" fill="#130d09" opacity=".35"/>
+  <g filter="url(#goldGlow)" stroke="#3a1b13" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="120" cy="68" r="36" fill="#f2bf91"/>
+    <path d="M84 66c1-34 18-49 42-47 23 2 37 20 31 53-12-7-19-20-24-32-13 17-30 25-49 26z" fill="#35251f"/>
+    <path d="M99 67h1m39 0h1" stroke-width="8"/>
+    <path d="M109 86q12 9 24 0" fill="none" stroke-width="4"/>
+    <path d="M82 124q38-29 76 0l18 113H64z" fill="url(#jacket)"/>
+    <path d="M91 133l29 31 29-31" fill="#fff4d6"/>
+    <path d="M67 143l-28 73 28 13 28-66" fill="#f2bf91"/>
+    <path d="M162 143l20 57-25 9-21-50" fill="#f2bf91"/>
+    <rect x="163" y="184" width="31" height="48" rx="5" fill="#252b35"/>
+    <circle cx="178.5" cy="222" r="2" fill="#ffd33d" stroke="none"/>
+    <path d="M78 235l-9 94h39l12-68 12 68h39l-9-94z" fill="#3c3f4b"/>
+    <path d="M68 329h42v16H54q-5-13 14-16zm104 0h-42v16h56q5-13-14-16z" fill="#eae5d8"/>
+    <path d="M48 214q-15 36 9 59h38q20-23 2-58z" fill="#fff0bd"/>
+    <path d="M50 226h45" fill="none" stroke="#d92c1d" stroke-width="8"/>
+    <path d="M63 214v-14q0-15 14-15t14 15v14" fill="none" stroke="#7d160e" stroke-width="7"/>
+  </g>
+</svg>

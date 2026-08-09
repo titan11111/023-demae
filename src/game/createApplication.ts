@@ -11,6 +11,7 @@ export async function createApplication(canvas: HTMLCanvasElement): Promise<Appl
     glslangUrl: 'https://cdn.jsdelivr.net/npm/@webgpu/glslang@0.0.15/dist/web-devel/glslang.js',
     twgslUrl: 'https://cdn.jsdelivr.net/npm/twgsl@0.0.2/dist/twgsl.js',
     antialias: true,
+    alpha: true,
   };
   let device;
   if ('gpu' in navigator) {

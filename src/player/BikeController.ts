@@ -7,6 +7,7 @@ export interface BikeEvents {
   onDrift: (points: number) => void;
   onCrash: () => void;
   onBoost: () => void;
+  onSpill: (force: number) => void;
 }
 
 export class BikeController {
@@ -20,7 +21,7 @@ export class BikeController {
   private driftAwarded = false;
   private boostBurst = 0;
   private readonly previous = new Vec3();
-  private readonly safePosition = new Vec3(0, .55, 51);
+  private readonly safePosition = new Vec3(0, .55, 102);
 
   constructor(private readonly app: Application, private readonly city: City, private readonly events: BikeEvents) {
     app.root.addChild(this.entity);
@@ -32,28 +33,31 @@ export class BikeController {
     if (this.input.consume('KeyR')) this.respawn();
     if (!this.enabled) { this.speed *= Math.pow(.04, dt); return; }
     const accelerating = this.input.isDown('KeyW', 'ArrowUp');
-    const braking = this.input.isDown('KeyS', 'ArrowDown');
+    const reversing = this.input.isDown('KeyS', 'ArrowDown');
     const left = this.input.isDown('KeyA', 'ArrowLeft');
     const right = this.input.isDown('KeyD', 'ArrowRight');
     const drifting = this.input.isDown('Space') && (left || right) && this.speed > 22;
     const boosting = this.input.isDown('ShiftLeft', 'ShiftRight') && this.boost > 0 && this.speed > 12;
 
-    const maxSpeed = boosting || this.boostBurst > 0 ? 100 : 80;
-    if (accelerating) this.speed += (boosting ? 48 : 34) * dt;
-    else this.speed -= 10 * dt;
-    if (braking) this.speed -= 48 * dt;
+    const maxSpeed = boosting || this.boostBurst > 0 ? 200 : 160;
+    if (accelerating) this.speed += (boosting ? 104 : this.speed < 0 ? 82 : 62) * dt;
+    else if (reversing) this.speed -= (this.speed > 0 ? 72 : 34) * dt;
+    else if (this.speed > 0) this.speed = Math.max(0, this.speed - 10 * dt);
+    else this.speed = Math.min(0, this.speed + 10 * dt);
     if (boosting) {
-      this.boost = Math.max(0, this.boost - 30 * dt);
-      this.speed += 42 * dt;
+      this.boost = Math.max(0, this.boost - 20 * dt);
+      this.speed += 78 * dt;
       this.events.onBoost();
     } else this.boost = Math.min(100, this.boost + 2.8 * dt);
     this.boostBurst = Math.max(0, this.boostBurst - dt);
-    this.speed = Math.max(0, Math.min(maxSpeed, this.speed));
+    this.speed = Math.max(-35, Math.min(maxSpeed, this.speed));
 
     const steer = (left ? 1 : 0) - (right ? 1 : 0);
-    const speedRatio = this.speed / 100;
+    const speedRatio = Math.abs(this.speed) / 200;
     const steerRate = drifting ? 2.25 : 1.75 - speedRatio * .72;
-    this.heading += steer * steerRate * dt * Math.min(1, this.speed / 9);
+    const travelDirection = this.speed < 0 ? -1 : 1;
+    this.heading += steer * travelDirection * steerRate * dt * Math.min(1, Math.abs(this.speed) / 9);
+    if (steer !== 0 && this.speed > 48) this.events.onSpill(Math.abs(steer) * speedRatio * dt);
 
     if (drifting) {
       this.driftTime += dt;
@@ -75,7 +79,7 @@ export class BikeController {
     position.x += Math.sin(this.heading) * metersPerSecond * dt;
     position.z += Math.cos(this.heading) * metersPerSecond * dt;
     if (this.city.resolveCollision(position, this.previous)) {
-      if (this.speed > 22) this.events.onCrash();
+      if (Math.abs(this.speed) > 22) this.events.onCrash();
       this.speed *= .25;
     }
     position.y = .55;
@@ -84,7 +88,7 @@ export class BikeController {
   }
 
   reset(): void {
-    this.entity.setPosition(0, .55, 51);
+    this.entity.setPosition(0, .55, 102);
     this.heading = Math.PI;
     this.speed = 0;
     this.boost = 65;
@@ -103,7 +107,7 @@ export class BikeController {
   }
 
   private isOnRoad(position: Vec3): boolean {
-    return Math.abs(position.x) < 12 || Math.abs(position.z) < 12 || (Math.abs(position.z - 38) < 9) || (Math.abs(position.z + 42) < 9);
+    return Math.abs(position.x) < 12 || Math.abs(position.z) < 12 || (Math.abs(position.z - 76) < 9) || (Math.abs(position.z + 84) < 9);
   }
 
   private createModel(): void {

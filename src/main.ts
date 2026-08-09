@@ -1,6 +1,10 @@
 import './styles.css';
 import './hud-overrides.css';
 
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+document.documentElement.classList.toggle('is-ios', isIOS);
+
 let lastTap = 0;
 document.addEventListener('touchstart', (event) => {
   const now = Date.now();
