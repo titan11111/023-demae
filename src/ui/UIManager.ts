@@ -50,6 +50,48 @@ export class UIManager {
 
   showHud(): void {
     this.root.innerHTML = `
+      <style id="mobile-hud-layout-fix">
+        @media (pointer: coarse), (max-width: 900px) {
+          .hud .objective {
+            top: auto !important;
+            bottom: max(18px, env(safe-area-inset-bottom)) !important;
+            left: 50% !important;
+            z-index: 8;
+            min-width: 120px;
+            padding: 3px 10px 5px;
+            background: rgba(16, 13, 10, .82);
+            border-bottom: 3px solid var(--yellow);
+            border-radius: 8px;
+          }
+          .hud .objective span { font-size: 24px; line-height: 1; }
+          .hud .objective b { background: transparent; padding: 0 6px; }
+          .hud .objective em { font-size: 19px; line-height: 1; }
+          .hud .minimap-frame {
+            bottom: max(112px, calc(env(safe-area-inset-bottom) + 96px)) !important;
+          }
+          .hud .speedometer {
+            bottom: max(122px, calc(env(safe-area-inset-bottom) + 106px)) !important;
+          }
+          .hud .control-hint { display: none !important; }
+        }
+        @media (pointer: coarse) and (max-height: 520px) {
+          .hud .minimap-frame {
+            left: max(14px, env(safe-area-inset-left)) !important;
+            bottom: max(106px, calc(env(safe-area-inset-bottom) + 92px)) !important;
+            transform: rotate(-1deg) scale(.86);
+            transform-origin: bottom left;
+          }
+          .hud .speedometer {
+            right: max(14px, env(safe-area-inset-right)) !important;
+            bottom: max(112px, calc(env(safe-area-inset-bottom) + 98px)) !important;
+            transform: skewX(-4deg) scale(.88);
+            transform-origin: bottom right;
+          }
+          .hud .objective {
+            bottom: max(10px, env(safe-area-inset-bottom)) !important;
+          }
+        }
+      </style>
       <section class="hud active">
         <div class="hud-top"><div><small>DELIVERY</small><b id="deliveries">0</b><i>件</i></div><div class="timer"><small>TIME LEFT</small><b id="time">01:30</b></div><div class="score"><small>SCORE</small><b id="score">0</b></div></div>
         <div id="objective" class="objective"><span>▼</span><b>目的地</b><em>0m</em></div>
