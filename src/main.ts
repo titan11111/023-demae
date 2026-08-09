@@ -1,4 +1,5 @@
 import './styles.css';
+import './hud-overrides.css';
 
 let lastTap = 0;
 document.addEventListener('touchstart', (event) => {
