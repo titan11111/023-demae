@@ -5,4 +5,4 @@
     <div class="loading-line"><i></i></div>
     <p>街を仕込み中…</p>
   </section>
-`;L(async()=>{const{Game:r}=await import("./Game-Dk-oWNcn.js").then(t=>t.gz);return{Game:r}},[],import.meta.url).then(({Game:r})=>{const t=document.querySelector("#game-canvas");if(!t)throw new Error("Game canvas was not found");new r(t,p).start()});export{L as _};
+`;L(async()=>{const{Game:r}=await import("./Game-BiWJXyA6.js").then(t=>t.gz);return{Game:r}},[],import.meta.url).then(({Game:r})=>{const t=document.querySelector("#game-canvas");if(!t)throw new Error("Game canvas was not found");new r(t,p).start()});export{L as _};
